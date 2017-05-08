@@ -1,12 +1,13 @@
 (def project 'adamant)
 (def version "0.1.0-SNAPSHOT")
 
-(set-env! :resource-paths #{"resources" "src"}
+(set-env! :resource-paths #{"src"}
           :source-paths   #{"test"}
-          :dependencies   '[[org.clojure/clojure "1.9.0-alpha15"]
-                            [metosin/boot-alt-test "0.3.0"]
+          :dependencies   '[[org.clojure/clojure "1.9.0-alpha16"]
+                            [metosin/boot-alt-test "0.3.2"]
 
-                            [im.chit/lucid.query "1.3.4"]
+                            [com.maitria/specter-edn "0.1.1-SNAPSHOT"]
+                            [im.chit/lucid.query "1.3.7"]
                             [im.chit/hara "2.5.2"]])
 
 (task-options!

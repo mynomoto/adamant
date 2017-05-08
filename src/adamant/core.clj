@@ -7,8 +7,10 @@
      [set :as set :refer [union]]
      [walk :as walk]]
     [lucid.query :as q]
-    [clojure.core.specs :as core-specs]
-    [clojure.spec :as s]))
+    [com.rpl.specter :as specter]
+    [specter-edn.core :as specter-edn]
+    [clojure.core.specs.alpha :as core-specs]
+    [clojure.spec.alpha :as s]))
 
 (s/def ::ns (s/cat :name simple-symbol? :docstring (s/? string?) :attr-map (s/? map?) :clauses ::core-specs/ns-clauses))
 
