@@ -1,6 +1,7 @@
 (ns adamant.core
   (:require
     clojure.string
+    [clojure.walk]
     [clojure.core.match :refer [match]]
     [clojure.java
      [io :as io :refer [reader]]]
@@ -41,6 +42,7 @@
       {:clause :require,
        :libs
        [[:lib clojure.string]
+        [:prefix-list {:prefix clojure.walk}]
         [:prefix-list
          {:prefix clojure.core.match, :refer {:refer [:syms [match]]}}]
         [:prefix-list
@@ -72,3 +74,23 @@
   (fn [clauses] (mapv #(match %
            [:require require] [:require (identity require)]
            else else) clauses)))
+
+(defn merge-sufix
+  [prefix]
+  
+  )
+(match '{:prefix clojure.java,
+         :suffix
+         [[:prefix-list
+           {:prefix io, :refer {:as io, :refer [:syms [reader]]}}]]}
+  {:prefix prefix
+   :suffix sufix} [prefix sufix]
+  prefix-list prefix-list)
+
+
+(match '[:prefix-list
+         {:prefix clojure.java,
+          :suffix
+          [[:prefix-list
+            {:prefix io, :refer {:as io, :refer [:syms [reader]]}}]]}]
+  [:prefix-list prefix] (merge-suffix prefix))
