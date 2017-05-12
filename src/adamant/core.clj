@@ -34,7 +34,20 @@
              (first
                (sp/select [spe/SEXPRS sp/ALL (sp/codewalker (fn [form]  (when (or (list? form) (vector? form)) (= 'ns  (first form)))))] self-file))))
 
-(update
+(defn append-prefix
+  [prefix suffix]
+  (match suffix
+    [:lib lib] [:lib (symbol (str (name prefix) "." (name lib)))]
+    [:prefix-list prefix-list] [:prefix-list (update prefix-list :prefix #(symbol (str (name prefix) "." (name %))))]))
+
+(defn remove-suffix
+  [lib]
+  (match lib
+    [:prefix-list {:prefix prefix
+                   :suffix suffix}] (mapv #(append-prefix prefix %) suffix)
+    else else))
+
+(def sample
   '{:form ns,
     :name adamant.core,
     :clauses
@@ -69,28 +82,15 @@
       {:clause :import,
        :classes
        [[:package-list
-         {:package java.io, :classes [FileReader BufferedReader]}]]}]]}
-  :clauses
-  (fn [clauses] (mapv #(match %
-           [:require require] [:require (identity require)]
-           else else) clauses)))
+         {:package java.io, :classes [FileReader BufferedReader]}]]}]]})
 
-(defn merge-sufix
-  [prefix]
-  
-  )
-(match '{:prefix clojure.java,
-         :suffix
-         [[:prefix-list
-           {:prefix io, :refer {:as io, :refer [:syms [reader]]}}]]}
-  {:prefix prefix
-   :suffix sufix} [prefix sufix]
-  prefix-list prefix-list)
+(s/unform ::ns sample)
 
-
-(match '[:prefix-list
-         {:prefix clojure.java,
-          :suffix
-          [[:prefix-list
-            {:prefix io, :refer {:as io, :refer [:syms [reader]]}}]]}]
-  [:prefix-list prefix] (merge-suffix prefix))
+(defn normalize-ns
+  [conformed-ns]
+  (-> conformed-ns
+      (update :clauses
+        (fn [clauses] (mapv (fn [clause]
+                              (match clause
+                                [:require require] [:require (update require :libs #(mapv remove-suffix %))]
+                                else else)) clauses)))))
