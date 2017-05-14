@@ -21,7 +21,7 @@
 ; Using lucid.query
 (def fragment {:file "src/adamant/core.clj"})
 
-(def conformed
+#_(def conformed
   (s/conform ::ns (first (q/$ fragment [ns]))))
 
 ; Using specter
@@ -33,6 +33,16 @@
   (s/conform ::ns
              (first
                (sp/select [spe/SEXPRS sp/ALL (sp/codewalker (fn [form]  (when (or (list? form) (vector? form)) (= 'ns  (first form)))))] self-file))))
+
+(defn t
+  []
+  (sp/transform
+    [spe/SEXPRS sp/ALL (sp/codewalker
+                         (fn [form]
+                           (when (or (list? form) (vector? form))
+                             (= 'ns  (first form)))))]
+    (fn [form] (first form))
+    self-file))
 
 (defn append-prefix
   [prefix suffix]
@@ -84,13 +94,16 @@
        [[:package-list
          {:package java.io, :classes [FileReader BufferedReader]}]]}]]})
 
-(s/unform ::ns sample)
-
 (defn normalize-ns
   [conformed-ns]
   (-> conformed-ns
       (update :clauses
         (fn [clauses] (mapv (fn [clause]
-                              (match clause
-                                [:require require] [:require (update require :libs #(mapv remove-suffix %))]
-                                else else)) clauses)))))
+                                   (match clause
+                                     [:require require] [:require (update require :libs #(->> %
+                                                                                              (mapv remove-suffix)
+                                                                                              (reduce (fn [libs lib]
+                                                                                                        (if (vector? (first lib))
+                                                                                                          (into libs lib)
+                                                                                                          (conj libs lib))) [])))]
+                                     else else)) clauses)))))
