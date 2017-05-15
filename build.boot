@@ -1,11 +1,13 @@
 (def project 'adamant)
 (def version "0.1.0-SNAPSHOT")
 
-(set-env! :resource-paths #{"src"}
+(set-env! :resource-paths #{"src" "resources"}
           :source-paths   #{"test"}
           :dependencies   '[[org.clojure/clojure "1.9.0-alpha16"]
                             [org.clojure/core.match "0.3.0-alpha4"]
                             [metosin/boot-alt-test "0.3.2"]
+
+                            [zprint "0.4.0"]
 
                             [com.maitria/specter-edn "0.1.2-SNAPSHOT"]
                             [im.chit/lucid.query "1.3.7"]
