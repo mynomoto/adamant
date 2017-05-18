@@ -1,9 +1,10 @@
-(ns adamant.core
+(ns adamant.sample
   (:refer-clojure :exclude [ancestors printf])
-  (:require clojure.pprint
-            [clojure.core.match :refer [match] :as match]
+  (:require [clojure.core.match :refer [match] :as match]
+            [clojure.set :as set :refer [union]]
+            [clojure.walk :as walk]
             [lucid.query :as q]
-            [clojure string [set :as set :refer [union]] [walk :as walk]])
+            clojure.pprintclojure.string)
   (:import (java.util Date Timer Random)
            (java.sql Connection Statement)))
 

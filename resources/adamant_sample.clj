@@ -1,4 +1,4 @@
-(ns adamant.core
+(ns adamant.sample
   (:refer-clojure :exclude [ancestors printf])
   (:require
     clojure.pprint

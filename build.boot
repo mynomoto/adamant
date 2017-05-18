@@ -9,7 +9,7 @@
 
                             [zprint "0.4.0"]
 
-                            [com.maitria/specter-edn "0.1.2-SNAPSHOT"]
+                            [com.maitria/specter-edn "0.1.2"]
                             [im.chit/lucid.query "1.3.7"]
                             [im.chit/hara "2.5.2"]])
 
