@@ -60,38 +60,15 @@
   [ns-form]
   (for [element ns-form]
     (match element
-      ([:require & args] :seq) (apply list (map #(if (seq? %) (vec %) %) element))
+      ([:require & args] :seq) (apply list :require (map #(if (seq? %) (vec %) %) (sort-by str args)))
       _ element)))
 
-(transform
-  "resources/adamant_sample.clj"
-  "resources/adamant_sample2.clj"
-  (fn [form]
-    (when (or (list? form) (vector? form))
-      (= 'ns  (first form))))
-  (fn [form] (-> form conform-ns normalize-ns unform-ns use-vector-on-require))
-  "transform")
-
-(defn simple-transform
-  [file-in filter-fn transform-fn]
-  (sp/transform
-    [SEXPRS sp/ALL (sp/codewalker filter-fn)]
-    transform-fn
-    (slurp file-in)))
-
-(defn debugf [v k]
-  (println k v) v)
-
-(defn debugl [k v]
-  (println v k) v)
-
-(defn debug [v]
-  (println :debug v) v)
-
-(defn st []
-(simple-transform
-  "resources/adamant_sample.clj"
-  (fn [form]
-    (when (or (list? form) (vector? form))
-      (= 'ns  (first form))))
-  (fn [form] (-> form conform-ns normalize-ns unform-ns use-vector-on-require))))
+(comment
+  (transform
+    "resources/adamant_sample.clj"
+    "resources/adamant_sample2.clj"
+    (fn [form]
+      (when (or (list? form) (vector? form))
+        (= 'ns  (first form))))
+    (fn [form] (-> form conform-ns normalize-ns unform-ns use-vector-on-require))
+    "transform"))
