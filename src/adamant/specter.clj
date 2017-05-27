@@ -3,6 +3,7 @@
     [adamant.core :as adamant]
     [clojure.core.match :refer [match]]
     [zprint.core :as zp]
+    [hara.io.file :as f]
     [com.rpl.specter :as sp]
     [specter-edn.core :refer [SEXPRS]]
     [clojure.spec.alpha :as s]))
@@ -72,3 +73,22 @@
         (= 'ns  (first form))))
     (fn [form] (-> form conform-ns normalize-ns unform-ns use-vector-on-require))
     "transform"))
+
+(defn fix-ns
+  [file]
+  (try
+    (transform
+      file
+      file
+      (fn [form]
+        (when (or (list? form) (vector? form))
+          (= 'ns  (first form))))
+      (fn [form] (-> form conform-ns normalize-ns unform-ns use-vector-on-require))
+      file)
+    (catch Exception e (str file " could not be fixed"))))
+
+(defn fix-project-ns
+  [path]
+  (->> (f/select path {:exclude [f/directory? ".git/"] :recursive true :include [".clj$" ".cljs$" ".edn$" ".cljc$"]})
+       (map str)
+       (mapv fix-ns)))
