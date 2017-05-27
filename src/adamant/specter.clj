@@ -61,7 +61,7 @@
   [ns-form]
   (for [element ns-form]
     (match element
-      ([:require & args] :seq) (apply list :require (map #(if (seq? %) (vec %) %) (sort-by str args)))
+      ([:require & args] :seq) (apply list :require (sort-by str (map #(if (seq? %) (vec %) %) args)))
       _ element)))
 
 (comment
