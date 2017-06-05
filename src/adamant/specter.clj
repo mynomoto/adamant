@@ -12,6 +12,11 @@
   [ns-form]
   (s/conform ::adamant/ns ns-form))
 
+(defn short-circuit-invalid
+  [conformed-ns]
+  (when-not (= conformed-ns :clojure.spec.alpha/invalid)
+    conformed-ns))
+
 (defn unform-ns
   [conformed-ns]
   (s/unform ::adamant/ns conformed-ns))
@@ -19,12 +24,10 @@
 (defn transform
   [file-in file-out filter-fn transform-fn file-id]
   (spit file-out
-    (zp/zprint-file-str
-      (sp/transform
-        [SEXPRS sp/ALL (sp/codewalker filter-fn)]
-        transform-fn
-        (slurp file-in))
-      file-id)))
+    (sp/transform
+      [SEXPRS sp/ALL (sp/codewalker filter-fn)]
+      transform-fn
+      (slurp file-in))))
 
 (defn append-prefix
   [prefix suffix]
@@ -61,34 +64,24 @@
   [ns-form]
   (for [element ns-form]
     (match element
-      ([:require & args] :seq) (apply list :require (sort-by str (map #(if (seq? %) (vec %) %) args)))
+      ([:require & args] :seq) (apply list :require (sort-by str (mapv #(if (seq? %) (vec %) %) args)))
       _ element)))
-
-(comment
-  (transform
-    "resources/adamant_sample.clj"
-    "resources/adamant_sample2.clj"
-    (fn [form]
-      (when (or (list? form) (vector? form))
-        (= 'ns  (first form))))
-    (fn [form] (-> form conform-ns normalize-ns unform-ns use-vector-on-require))
-    "transform"))
 
 (defn fix-ns
   [file]
-  (try
-    (transform
-      file
-      file
-      (fn [form]
-        (when (or (list? form) (vector? form))
-          (= 'ns  (first form))))
-      (fn [form] (-> form conform-ns normalize-ns unform-ns use-vector-on-require))
-      file)
-    (catch Exception e (str file " could not be fixed"))))
+  (transform
+    file
+    file
+    (fn [form]
+      (when (or (list? form) (vector? form))
+        (= 'ns  (first form))))
+    (fn [form] (if-let [new-ns (some-> form conform-ns short-circuit-invalid normalize-ns unform-ns use-vector-on-require)]
+                 new-ns
+                 form))
+    file))
 
 (defn fix-project-ns
   [path]
   (->> (f/select path {:exclude [f/directory? ".git/"] :recursive true :include [".clj$" ".cljs$" ".edn$" ".cljc$"]})
-       (map str)
+       (mapv str)
        (mapv fix-ns)))
