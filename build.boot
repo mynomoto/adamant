@@ -7,6 +7,7 @@
                             [org.clojure/core.match "0.3.0-alpha4"]
                             [metosin/boot-alt-test "0.3.2"]
 
+                            [rewrite-clj "0.6.0"]
                             [zprint "0.4.0"]
 
                             [com.maitria/specter-edn "0.1.4-SNAPSHOT"]
