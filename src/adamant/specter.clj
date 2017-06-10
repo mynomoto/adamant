@@ -2,7 +2,6 @@
   (:require
     [adamant.core :as adamant]
     [clojure.core.match :refer [match]]
-    [zprint.core :as zp]
     [hara.io.file :as f]
     [com.rpl.specter :as sp]
     [specter-edn.core :refer [SEXPRS]]

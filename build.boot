@@ -8,7 +8,6 @@
                             [metosin/boot-alt-test "0.3.2"]
 
                             [rewrite-clj "0.6.0"]
-                            [zprint "0.4.0"]
 
                             [com.maitria/specter-edn "0.1.4-SNAPSHOT"]
                             [im.chit/lucid.query "1.3.7"]
