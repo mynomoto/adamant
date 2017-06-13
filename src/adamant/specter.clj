@@ -68,16 +68,19 @@
 
 (defn fix-ns
   [file]
-  (transform
-    file
-    file
-    (fn [form]
-      (when (or (list? form) (vector? form))
-        (= 'ns  (first form))))
-    (fn [form] (if-let [new-ns (some-> form conform-ns short-circuit-invalid normalize-ns unform-ns use-vector-on-require)]
-                 new-ns
-                 form))
-    file))
+  (try
+    (transform
+      file
+      file
+      (fn [form]
+        (when (or (list? form) (vector? form))
+          (= 'ns  (first form))))
+      (fn [form] (if-let [new-ns (some-> form conform-ns short-circuit-invalid normalize-ns unform-ns use-vector-on-require)]
+                   new-ns
+                   form))
+      file)
+    (catch Exception e
+      (str file ": " (pr-str e)))))
 
 (defn fix-project-ns
   [path]
