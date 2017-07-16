@@ -64,6 +64,7 @@
   (for [element ns-form]
     (match element
       ([:require & args] :seq) (apply list :require (sort-by str (mapv #(if (seq? %) (vec %) %) args)))
+      ([:require-macros & args] :seq) (apply list :require-macros (sort-by str (mapv #(if (seq? %) (vec %) %) args)))
       _ element)))
 
 (defn fix-ns
